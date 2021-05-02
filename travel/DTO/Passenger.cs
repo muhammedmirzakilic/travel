@@ -3,9 +3,8 @@ using travel.Enums;
 
 namespace travel.DTO
 {
-    public class Passenger
+    public class Passenger : BaseIdentityModel
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public bool Gender { get; set; }

@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using travel.Data;
+using travel.DTO;
+using travel.Interfaces;
+using travel.Services;
 
 namespace travel
 {
@@ -28,6 +32,9 @@ namespace travel
         {
 
             services.AddControllers();
+            services.AddMemoryCache();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPassengerService, PassengerService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "travel", Version = "v1" });
@@ -35,7 +42,7 @@ namespace travel
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
             if (env.IsDevelopment())
             {
@@ -54,6 +61,49 @@ namespace travel
             {
                 endpoints.MapControllers();
             });
+            AddDummyData(services);
+        }
+
+        public void AddDummyData(IServiceProvider services)
+        {
+            var passengerService = services.GetService<IPassengerService>();
+            var dummyPassengers = new List<Passenger>();
+            dummyPassengers.Add(new Passenger()
+            {
+                DocumentNo = "1",
+                DocumentType = Enums.DocumentType.Passport,
+                Gender = true,
+                IssueDate = DateTime.UtcNow,
+                Name = "Muhammed",
+                Surname = "Kilic"
+            });
+
+            dummyPassengers.Add(new Passenger()
+            {
+                DocumentNo = "2",
+                DocumentType = Enums.DocumentType.Passport,
+                Gender = true,
+                IssueDate = DateTime.UtcNow,
+                Name = "Mirza",
+                Surname = "Kilic"
+            });
+
+            dummyPassengers.Add(new Passenger()
+            {
+                DocumentNo = "2",
+                DocumentType = Enums.DocumentType.Passport,
+                Gender = true,
+                IssueDate = DateTime.UtcNow,
+                Name = "Muhammed Mirza",
+                Surname = "Kilic"
+            });
+            var random = new Random();
+            foreach (var passenger in dummyPassengers)
+            {
+                var source = random.Next(10) % 2 == 0 ?
+                    Enums.Source.Offline : Enums.Source.Online;
+                passengerService.Create(source, passenger);
+            }
         }
     }
 }
