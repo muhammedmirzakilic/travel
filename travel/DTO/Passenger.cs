@@ -1,0 +1,16 @@
+﻿using System;
+using travel.Enums;
+
+namespace travel.DTO
+{
+    public class Passenger
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public bool Gender { get; set; }
+        public string DocumentNo { get; set; }
+        public DocumentType DocumentType { get; set; }
+        public DateTime IssueDate { get; set; }
+    }
+}
